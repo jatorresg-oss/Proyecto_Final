@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LogiTrans Express | Panel</title>
+  <link rel="stylesheet" href="../css/styles.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand-badge">LT</span>
+      <span>LogiTrans Express</span>
+    </div>
+    <div class="topbar-user">
+      <span id="userName">—</span>
+      <button id="logoutBtn" type="button" class="btn-ghost">Cerrar sesión</button>
+    </div>
+  </header>
+
+  <main class="container">
+    <h1>Panel operativo</h1>
+    <p id="welcome" class="muted"></p>
+
+    <section class="grid" id="modules">
+      <article class="card">
+        <h2>Conductores</h2>
+        <p class="muted">Registro de conductores, licencias y disponibilidad.</p>
+        <span class="badge pending">Programado · Día 4</span>
+      </article>
+      <article class="card">
+        <h2>Vehículos</h2>
+        <p class="muted">Flota, capacidad de carga y estados.</p>
+        <span class="badge pending">Programado · Día 6</span>
+      </article>
+      <article class="card">
+        <h2>Rutas</h2>
+        <p class="muted">Ciudades, distancias y tiempos estimados.</p>
+        <span class="badge pending">Programado · Día 8</span>
+      </article>
+      <article class="card">
+        <h2>Programación</h2>
+        <p class="muted">Asignación de conductor, vehículo y ruta.</p>
+        <span class="badge pending">Programado · Día 10</span>
+      </article>
+      <article class="card">
+        <h2>Viajes</h2>
+        <p class="muted">Estados, novedades y seguimiento operativo.</p>
+        <span class="badge pending">Programado · Día 12</span>
+      </article>
+    </section>
+  </main>
+
+  <script src="../js/auth.js"></script>
+  <script src="../js/api.js"></script>
+  <script src="../js/dashboard.js"></script>
+</body>
+</html>

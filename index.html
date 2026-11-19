@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LogiTrans Express | Iniciar sesión</title>
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body class="auth-page">
+  <main class="auth-card">
+    <header class="auth-brand">
+      <span class="brand-badge">LT</span>
+      <div>
+        <h1>LogiTrans Express</h1>
+        <p>Control de rutas y transporte de carga</p>
+      </div>
+    </header>
+
+    <form id="loginForm" name="loginForm" novalidate>
+      <label for="identifier">Usuario o correo</label>
+      <input id="identifier" name="identifier" type="text" autocomplete="username" required />
+
+      <label for="password">Contraseña</label>
+      <input id="password" name="password" type="password" autocomplete="current-password" required />
+
+      <button type="submit">Iniciar sesión</button>
+      <p id="loginMessage" class="message" role="status" aria-live="polite"></p>
+    </form>
+
+    <footer class="auth-footer">
+      <small>Examen práctico · Programación · 2026</small>
+    </footer>
+  </main>
+
+  <script src="js/auth.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/login.js"></script>
+</body>
+</html>
