@@ -1,0 +1,12 @@
+### ms-rutas · Rutas y programación - pruebas manuales
+
+@host = http://127.0.0.1:8004
+
+### Estado del servicio
+GET {{host}}/health
+
+### Listado inicial (verifica la conexión a la base de datos)
+GET {{host}}/rutas
+
+### Programaciones de viajes
+GET {{host}}/programaciones

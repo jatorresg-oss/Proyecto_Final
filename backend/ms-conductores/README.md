@@ -1,0 +1,61 @@
+# ms-conductores · Conductores
+
+Microservicio de gestión de conductores del sistema **LogiTrans Express** (control de rutas y transporte de carga).
+
+## Stack
+
+- PHP 8+
+- Slim Framework 4
+- Eloquent ORM (`illuminate/database`)
+- MySQL / MariaDB
+- Composer
+
+## Estructura
+
+```
+ms-conductores/
+├─ app/
+│  ├─ Controllers/          Lógica de negocio
+│  ├─ Models/               Modelos Eloquent
+│  ├─ Presentation/
+│  │  ├─ Repositories/      Adaptadores HTTP (request → response)
+│  │  └─ Routers/           Definición de endpoints
+│  ├─ Middlewares/
+│  │  └─ cors.php
+│  └─ global/
+│     └─ database_config.php
+├─ public/index.php         Punto de entrada
+├─ db/                      Scripts de la base de datos
+├─ endpoints.http           Pruebas manuales de la API
+├─ .env.example
+├─ composer.json
+└─ README.md
+```
+
+## Puesta en marcha
+
+```bash
+composer install
+copy .env.example .env          # Linux/macOS: cp .env.example .env
+C:\xampp\php\php.exe -S 127.0.0.1:8002 -t public
+```
+
+> `vendor/`, `.env` y `composer.lock` **no** se versionan (requisito del examen).
+
+## Endpoints
+
+| Método | Ruta | Descripción |
+|---|---|---|
+| GET | `/health` | Estado del microservicio |
+| GET | `/conductores` | Listado inicial (verificación de BD) |
+
+## Base de datos
+
+Base de datos: **`logitrans`**, compartida con todos los servicios del
+proyecto. Este microservicio vive en `backend/ms-conductores/` dentro del repositorio único.
+
+## Estado del proyecto
+
+- **Día 1:** esqueleto del microservicio, CORS, conexión a la base de datos y
+  endpoint de salud.
+- **Día 2:** base única `logitrans`, modelo ajustado y datos de prueba.

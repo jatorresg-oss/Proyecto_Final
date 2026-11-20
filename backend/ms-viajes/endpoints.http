@@ -1,0 +1,9 @@
+### ms-viajes · Viajes y seguimiento - pruebas manuales
+
+@host = http://127.0.0.1:8005
+
+### Estado del servicio
+GET {{host}}/health
+
+### Listado de seguimientos (verifica la conexión a la base de datos)
+GET {{host}}/seguimientos
