@@ -1,9 +1,157 @@
 ### ms-conductores · Conductores - pruebas manuales
 
+@auth = http://127.0.0.1:8001
 @host = http://127.0.0.1:8002
 
-### Estado del servicio
+### Obtener token (ms-auth)
+# @name login
+POST {{auth}}/login
+Content-Type: application/json
+
+{
+  "usuario": "admin",
+  "password": "admin123"
+}
+
+@token = {{login.response.body.token}}
+
+### Estado del servicio (público)
 GET {{host}}/health
 
-### Listado inicial (verifica la conexión a la base de datos)
+### Listado general
 GET {{host}}/conductores
+Authorization: Bearer {{token}}
+
+### Sin token -> 401
+GET {{host}}/conductores
+
+### Buscar por documento (coincidencia parcial)
+GET {{host}}/conductores/buscar?documento=1023
+Authorization: Bearer {{token}}
+
+### Buscar por número de licencia
+GET {{host}}/conductores/buscar?licencia=LIC-109
+Authorization: Bearer {{token}}
+
+### Buscar por estado
+GET {{host}}/conductores/buscar?estado=disponible
+Authorization: Bearer {{token}}
+
+### Filtrar el listado directamente
+GET {{host}}/conductores?estado=en_ruta
+Authorization: Bearer {{token}}
+
+### Alias por estado
+GET {{host}}/conductores/estado/inactivo
+Authorization: Bearer {{token}}
+
+### Consultar por id
+GET {{host}}/conductores/1
+Authorization: Bearer {{token}}
+
+### Crear conductor -> 201
+# @name crear
+POST {{host}}/conductores
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "nombres": "Ana María",
+  "apellidos": "López",
+  "documento": "11223344",
+  "telefono": "3005551122",
+  "correo": "ana.lopez@logitrans.com",
+  "numero_licencia": "LIC-11223344",
+  "categoria_licencia": "C1",
+  "fecha_vencimiento_licencia": "2029-08-15"
+}
+
+@nuevoId = {{crear.response.body.id}}
+
+### Duplicar documento -> 409
+POST {{host}}/conductores
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "nombres": "Otro",
+  "apellidos": "Conductor",
+  "documento": "11223344",
+  "telefono": "3005551123",
+  "correo": "otro@logitrans.com",
+  "numero_licencia": "LIC-99999999",
+  "categoria_licencia": "C1",
+  "fecha_vencimiento_licencia": "2029-08-15"
+}
+
+### Licencia vencida -> 422
+POST {{host}}/conductores
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "nombres": "Licencia",
+  "apellidos": "Vencida",
+  "documento": "22334455",
+  "telefono": "3005551124",
+  "correo": "vencida@logitrans.com",
+  "numero_licencia": "LIC-22334455",
+  "categoria_licencia": "B1",
+  "fecha_vencimiento_licencia": "2020-01-01"
+}
+
+### Editar conductor (PUT)
+PUT {{host}}/conductores/{{nuevoId}}
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "nombres": "Ana María",
+  "apellidos": "López Ruiz",
+  "documento": "11223344",
+  "telefono": "3005551199",
+  "correo": "ana.lopez@logitrans.com",
+  "numero_licencia": "LIC-11223344",
+  "categoria_licencia": "C2",
+  "fecha_vencimiento_licencia": "2030-01-31",
+  "estado": "disponible"
+}
+
+### Editar solo el teléfono (PATCH)
+PATCH {{host}}/conductores/{{nuevoId}}
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "telefono": "3005551188"
+}
+
+### Cambiar estado
+PATCH {{host}}/conductores/{{nuevoId}}/estado
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "estado": "en_ruta"
+}
+
+### Estado no válido -> 422
+PATCH {{host}}/conductores/{{nuevoId}}/estado
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "estado": "desconocido"
+}
+
+### Eliminar conductor
+DELETE {{host}}/conductores/{{nuevoId}}
+Authorization: Bearer {{token}}
+
+### Eliminar conductor con programaciones -> 409
+DELETE {{host}}/conductores/1
+Authorization: Bearer {{token}}
+
+### Id inexistente -> 404
+GET {{host}}/conductores/9999
+Authorization: Bearer {{token}}

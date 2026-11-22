@@ -16,12 +16,13 @@ Microservicio de rutas y programación de viajes del sistema **LogiTrans Express
 ms-rutas/
 ├─ app/
 │  ├─ Controllers/          Lógica de negocio
-│  ├─ Models/               Modelos Eloquent
+│  ├─ Models/               Modelos Eloquent (incluye Usuario para auth)
 │  ├─ Presentation/
 │  │  ├─ Repositories/      Adaptadores HTTP (request → response)
 │  │  └─ Routers/           Definición de endpoints
 │  ├─ Middlewares/
-│  │  └─ cors.php
+│  │  ├─ cors.php
+│  │  └─ auth.php            Valida token Bearer contra logitrans
 │  └─ global/
 │     └─ database_config.php
 ├─ public/index.php         Punto de entrada
@@ -44,11 +45,15 @@ C:\xampp\php\php.exe -S 127.0.0.1:8004 -t public
 
 ## Endpoints
 
-| Método | Ruta | Descripción |
-|---|---|---|
-| GET | `/health` | Estado del microservicio |
-| GET | `/rutas` | Listado inicial de rutas (verificación de BD) |
-| GET | `/programaciones` | Listado de programaciones de viajes |
+| Método | Ruta | Autenticación | Descripción |
+|---|---|---|---|
+| GET | `/health` | No | Estado del microservicio |
+| GET | `/rutas` | Sí (Bearer) | Listado inicial de rutas (verificación de BD) |
+| GET | `/programaciones` | Sí (Bearer) | Listado de programaciones de viajes |
+
+Todos los recursos excepto `/health` exigen `Authorization: Bearer <token>`. El
+token se obtiene en `POST http://127.0.0.1:8001/login` y se valida contra la base
+compartida `logitrans`, sin comunicación HTTP con ms-auth.
 
 ## Base de datos
 
@@ -60,3 +65,4 @@ proyecto. Este microservicio vive en `backend/ms-rutas/` dentro del repositorio 
 - **Día 1:** esqueleto del microservicio, CORS, conexión a la base de datos y
   endpoint de salud.
 - **Día 2:** base única `logitrans`, modelo ajustado y datos de prueba.
+- **Día 3:** middleware de token compartido por los 5 microservicios.

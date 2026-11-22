@@ -3,9 +3,14 @@
 use App\Presentation\Repositories\ProgramacionesRepository;
 use App\Presentation\Repositories\RutasRepository;
 use Slim\App;
+use Slim\Routing\RouteCollectorProxy;
 
 return function (App $app) {
-    // Día 1: listados iniciales para verificar la conexión con la base de datos.
-    $app->get('/rutas', [RutasRepository::class, 'all']);
-    $app->get('/programaciones', [ProgramacionesRepository::class, 'all']);
+    $auth = require __DIR__ . '/../../Middlewares/auth.php';
+
+    // Todos los recursos requieren token Bearer; /health queda público.
+    $app->group('', function (RouteCollectorProxy $group) {
+        $group->get('/rutas', [RutasRepository::class, 'all']);
+        $group->get('/programaciones', [ProgramacionesRepository::class, 'all']);
+    })->add($auth);
 };

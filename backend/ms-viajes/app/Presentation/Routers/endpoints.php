@@ -2,8 +2,13 @@
 
 use App\Presentation\Repositories\SeguimientosRepository;
 use Slim\App;
+use Slim\Routing\RouteCollectorProxy;
 
 return function (App $app) {
-    // Día 1: listado inicial para verificar la conexión con la base de datos.
-    $app->get('/seguimientos', [SeguimientosRepository::class, 'all']);
+    $auth = require __DIR__ . '/../../Middlewares/auth.php';
+
+    // Todos los recursos requieren token Bearer; /health queda público.
+    $app->group('', function (RouteCollectorProxy $group) {
+        $group->get('/seguimientos', [SeguimientosRepository::class, 'all']);
+    })->add($auth);
 };

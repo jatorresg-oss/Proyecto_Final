@@ -1,9 +1,26 @@
 ### ms-viajes · Viajes y seguimiento - pruebas manuales
 
+@auth = http://127.0.0.1:8001
 @host = http://127.0.0.1:8005
 
-### Estado del servicio
+### Obtener token (ms-auth)
+# @name login
+POST {{auth}}/login
+Content-Type: application/json
+
+{
+  "usuario": "admin",
+  "password": "admin123"
+}
+
+@token = {{login.response.body.token}}
+
+### Estado del servicio (público)
 GET {{host}}/health
 
-### Listado de seguimientos (verifica la conexión a la base de datos)
+### Listado de seguimientos (requiere token)
+GET {{host}}/seguimientos
+Authorization: Bearer {{token}}
+
+### Sin token -> 401
 GET {{host}}/seguimientos

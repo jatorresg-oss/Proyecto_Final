@@ -49,12 +49,21 @@ Todos los servicios trabajan sobre la misma base de datos `logitrans`.
 ## Autenticación
 
 El token se guarda en `sessionStorage` (`logitrans.token`) y se envía en la
-cabecera `Authorization: Bearer <token>`. Si un servicio responde `401`, la
-sesión se limpia y se vuelve al login.
+cabecera `Authorization: Bearer <token>`.
+
+Flujo implementado:
+
+1. `login.js` envía `POST /login` a ms-auth con `{ usuario, password }` y guarda
+   `{ token, user }`.
+2. Al entrar al panel, `dashboard.js` llama a `GET /validate`; si falla, limpia
+   la sesión y devuelve al login.
+3. `apiRequest()` detecta cualquier `401`, limpia la sesión y redirige al login.
+4. El botón «Cerrar sesión» llama a `POST /logout` para invalidar el token en la
+   base de datos antes de limpiar `sessionStorage`.
 
 ## Estado del proyecto
 
 - **Día 1:** estructura del proyecto, estilos base, capa de acceso a la API y
   manejo de sesión.
-- **Día 2:** reubicación dentro del repositorio único; el login quedará
-  operativo cuando `ms-auth` exponga `POST /login`.
+- **Día 2:** reubicación dentro del repositorio único y datos de prueba.
+- **Día 3:** login operativo, validación de sesión y cierre de sesión real.

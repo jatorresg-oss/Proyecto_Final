@@ -1,12 +1,29 @@
 ### ms-rutas · Rutas y programación - pruebas manuales
 
+@auth = http://127.0.0.1:8001
 @host = http://127.0.0.1:8004
 
-### Estado del servicio
+### Obtener token (ms-auth)
+# @name login
+POST {{auth}}/login
+Content-Type: application/json
+
+{
+  "usuario": "admin",
+  "password": "admin123"
+}
+
+@token = {{login.response.body.token}}
+
+### Estado del servicio (público)
 GET {{host}}/health
 
-### Listado inicial (verifica la conexión a la base de datos)
+### Listados (requieren token)
 GET {{host}}/rutas
+Authorization: Bearer {{token}}
 
-### Programaciones de viajes
 GET {{host}}/programaciones
+Authorization: Bearer {{token}}
+
+### Sin token -> 401
+GET {{host}}/rutas

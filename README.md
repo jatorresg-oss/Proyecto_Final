@@ -89,16 +89,33 @@ cd frontend;               C:\xampp\php\php.exe -S 127.0.0.1:5501
 
 ## Endpoints
 
-| Servicio | Puerto | Base | Endpoints del Día 1 |
+| Servicio | Puerto | Base | Endpoints implementados |
 |---|---|---|---|
-| ms-auth | 8001 | `logitrans` | `GET /health`, `GET /usuarios` |
-| ms-conductores | 8002 | `logitrans` | `GET /health`, `GET /conductores` |
+| ms-auth | 8001 | `logitrans` | `GET /health`, `POST /login`, `GET /validate`, `POST /logout`, `GET /usuarios` |
+| ms-conductores | 8002 | `logitrans` | `GET /health`, CRUD de `/conductores`, búsquedas y cambio de estado |
 | ms-vehiculos | 8003 | `logitrans` | `GET /health`, `GET /vehiculos` |
 | ms-rutas | 8004 | `logitrans` | `GET /health`, `GET /rutas`, `GET /programaciones` |
 | ms-viajes | 8005 | `logitrans` | `GET /health`, `GET /seguimientos` |
 
 Cada servicio documenta su contrato en su propio `README.md` y en
 `endpoints.http`.
+
+## Autenticación
+
+Todos los endpoints excepto `/health` y `POST /login` requieren la cabecera
+`Authorization: Bearer <token>`. El token se obtiene con:
+
+```http
+POST http://127.0.0.1:8001/login
+Content-Type: application/json
+
+{ "usuario": "admin", "password": "admin123" }
+```
+
+Cada microservicio valida el token contra la tabla `usuarios` de `logitrans`
+(consultando directamente la base compartida; no hay comunicación HTTP entre
+servicios). El frontend guarda el token en `sessionStorage` y valida la sesión
+al cargar el panel.
 
 ## Usuarios de prueba
 
@@ -112,6 +129,9 @@ Cada servicio documenta su contrato en su propio `README.md` y en
 - **Día 1:** esqueleto de los 5 servicios, CORS, `/health`, login maquetado.
 - **Día 2:** consolidación en un solo repositorio, base única `logitrans` con
   las 6 tablas, modelos ajustados y datos de prueba.
+- **Día 3:** login, logout y `/validate` en ms-auth; middleware de token en los
+  5 microservicios; guard de sesión en el frontend.
+- **Día 4:** CRUD de conductores con búsquedas, cambio de estado y validaciones.
 
 ## Requisitos de entrega
 

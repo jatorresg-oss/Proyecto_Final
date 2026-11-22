@@ -2,8 +2,55 @@
 
 @host = http://127.0.0.1:8001
 
-### Estado del servicio
+### Estado del servicio (público)
 GET {{host}}/health
 
-### Listado inicial (verifica la conexión a la base de datos)
+### Inicio de sesión correcto (público)
+# @name login
+POST {{host}}/login
+Content-Type: application/json
+
+{
+  "usuario": "admin",
+  "password": "admin123"
+}
+
+> Obtener token de la respuesta anterior.
+@token = {{login.response.body.token}}
+
+### Inicio de sesión con correo (público)
+POST {{host}}/login
+Content-Type: application/json
+
+{
+  "correo": "logistica@logitrans.com",
+  "password": "logistica123"
+}
+
+### Credenciales incorrectas -> 401
+POST {{host}}/login
+Content-Type: application/json
+
+{
+  "usuario": "admin",
+  "password": "incorrecta"
+}
+
+### Validar token y sesión activa
+GET {{host}}/validate
+Authorization: Bearer {{token}}
+
+### Validar sin token -> 401
+GET {{host}}/validate
+
+### Cerrar sesión (invalida el token en base de datos)
+POST {{host}}/logout
+Authorization: Bearer {{token}}
+
+### El token ya no sirve -> 401
+GET {{host}}/validate
+Authorization: Bearer {{token}}
+
+### Listado de usuarios (protegido)
 GET {{host}}/usuarios
+Authorization: Bearer {{token}}

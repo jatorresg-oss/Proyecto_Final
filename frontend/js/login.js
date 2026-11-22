@@ -18,7 +18,7 @@ loginForm.addEventListener("submit", async (event) => {
   }
 
   try {
-    // Contrato acordado para ms-auth: POST /login -> { token, user }
+    // Contrato de ms-auth: POST /login -> { token, user }
     const data = await apiRequest(API.auth, "/login", {
       method: "POST",
       auth: false,
@@ -32,4 +32,11 @@ loginForm.addEventListener("submit", async (event) => {
   }
 });
 
-Session.redirectIfLogged();
+// Si queda un token de una pestaña anterior, se valida antes de entrar al panel.
+if (Session.isLogged()) {
+  Session.validateSession().then((valid) => {
+    if (valid) {
+      Session.redirectIfLogged();
+    }
+  });
+}

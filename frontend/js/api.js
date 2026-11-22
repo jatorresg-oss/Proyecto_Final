@@ -39,7 +39,8 @@ async function apiRequest(base, path, { method = "GET", body = null, auth = true
   }
 
   if (response.status === 401) {
-    Session.clear();
+    // En la página de login solo se limpia la sesión; en el resto se redirige.
+    Session.handleUnauthorized();
   }
 
   if (!response.ok) {

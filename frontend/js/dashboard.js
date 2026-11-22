@@ -1,13 +1,25 @@
-Session.requireAuth();
+if (Session.requireAuth()) {
+  initDashboard();
+}
 
-const user = Session.getUser();
-const displayName = (user && (user.nombre || user.username || user.correo)) || "Usuario";
+async function initDashboard() {
+  // El guard valida el token contra ms-auth antes de mostrar datos del panel.
+  const valid = await Session.validateSession();
+  if (!valid) {
+    return;
+  }
 
-document.getElementById("userName").textContent = displayName;
-document.getElementById("welcome").textContent = `Sesión iniciada como ${displayName}.`;
+  const user = Session.getUser() || {};
+  const displayName = user.nombre || user.usuario || user.correo || "Usuario";
 
-document.getElementById("logoutBtn").addEventListener("click", () => {
-  // El cierre de sesión contra ms-auth se completa el Día 3.
-  Session.clear();
-  window.location.href = "../index.html";
-});
+  document.getElementById("userName").textContent = displayName;
+  document.getElementById("welcome").textContent = `Sesión iniciada como ${displayName} (${user.rol || "sin rol"}).`;
+
+  document.getElementById("logoutBtn").addEventListener("click", async (event) => {
+    const button = event.currentTarget;
+    button.disabled = true;
+    button.textContent = "Cerrando sesión…";
+
+    await Session.logout();
+  });
+}

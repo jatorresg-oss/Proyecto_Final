@@ -236,3 +236,8 @@ button:hover {
   background: rgba(217, 119, 6, 0.18);
   color: #fbbf24;
 }
+
+.badge.success {
+  background: rgba(22, 163, 74, 0.18);
+  color: #86efac;
+}
