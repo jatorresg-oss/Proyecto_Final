@@ -15,9 +15,12 @@ conectados a una sola base de datos (`logitrans`).
 frontend-logistica/
 ├─ frontend/                     Interfaz web (puerto 5501)
 │  ├─ index.html                 Inicio de sesión
-│  ├─ pages/dashboard.html       Panel operativo
+│  ├─ pages/
+│  │  ├─ dashboard.html          Panel operativo
+│  │  └─ conductores.html        ABM de conductores
 │  ├─ css/styles.css
-│  └─ js/                        api.js, auth.js, login.js, dashboard.js
+│  └─ js/                        api.js, auth.js, login.js, dashboard.js,
+│                                conductores.js
 ├─ backend/
 │  ├─ ms-auth/                   Autenticación            (8001)
 │  ├─ ms-conductores/            Conductores              (8002)
@@ -132,6 +135,8 @@ al cargar el panel.
 - **Día 3:** login, logout y `/validate` en ms-auth; middleware de token en los
   5 microservicios; guard de sesión en el frontend.
 - **Día 4:** CRUD de conductores con búsquedas, cambio de estado y validaciones.
+- **Día 5:** frontend de conductores: tabla con badges, filtros, formulario de
+  alta/edición, cambio de estado y eliminación.
 
 ## Requisitos de entrega
 

@@ -13,14 +13,16 @@ documentación general y los microservicios están en el `README.md` de la raíz
 frontend/
 ├─ index.html               Inicio de sesión
 ├─ pages/
-│  └─ dashboard.html        Panel operativo
+│  ├─ dashboard.html        Panel operativo (acceso a los módulos)
+│  └─ conductores.html      ABM de conductores, filtros y estados
 ├─ css/
 │  └─ styles.css
 ├─ js/
 │  ├─ api.js                Configuración de servicios y fetch centralizado
 │  ├─ auth.js               Manejo del token y de la sesión
 │  ├─ login.js              Formulario de inicio de sesión
-│  └─ dashboard.js          Panel posterior al login
+│  ├─ dashboard.js          Panel posterior al login
+│  └─ conductores.js        Listado, formulario y acciones de conductores
 └─ README.md
 ```
 
@@ -61,9 +63,24 @@ Flujo implementado:
 4. El botón «Cerrar sesión» llama a `POST /logout` para invalidar el token en la
    base de datos antes de limpiar `sessionStorage`.
 
+## Módulo de conductores (Día 5)
+
+Página `pages/conductores.html`, accesible desde la tarjeta «Conductores» del
+panel. Usa `GET /conductores` (con filtros `documento`, `licencia` y `estado`),
+`GET /conductores/{id}`, `POST /conductores`, `PUT /conductores/{id}`,
+`PATCH /conductores/{id}/estado` y `DELETE /conductores/{id}` de ms-conductores.
+
+Incluye tabla con badges de estado, buscador, formulario de alta/edición,
+cambio rápido de estado y eliminación con confirmación. Las reglas de
+validación se repiten en `conductores.js` y en `ConductoresController.php`; la
+respuesta del backend (incluidos los errores 409/422) se muestra al usuario.
+Toda la sesión se valida antes de cargar la página y cualquier `401` devuelve
+al login.
+
 ## Estado del proyecto
 
 - **Día 1:** estructura del proyecto, estilos base, capa de acceso a la API y
   manejo de sesión.
 - **Día 2:** reubicación dentro del repositorio único y datos de prueba.
 - **Día 3:** login operativo, validación de sesión y cierre de sesión real.
+- **Día 5:** módulo completo de conductores en el frontend.

@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LogiTrans Express | Conductores</title>
+  <link rel="stylesheet" href="../css/styles.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand-badge">LT</span>
+      <span>LogiTrans Express</span>
+      <nav class="topnav" aria-label="Navegación principal">
+        <a href="dashboard.html">Panel</a>
+        <a href="conductores.html" class="active">Conductores</a>
+      </nav>
+    </div>
+    <div class="topbar-user">
+      <span id="userName">—</span>
+      <button id="logoutBtn" type="button" class="btn-ghost">Cerrar sesión</button>
+    </div>
+  </header>
+
+  <main class="container">
+    <div class="page-header">
+      <div>
+        <h1>Conductores</h1>
+        <p class="muted">Registro de conductores, licencias y disponibilidad.</p>
+      </div>
+      <button id="nuevoBtn" type="button" class="btn-small btn-primary">+ Nuevo conductor</button>
+    </div>
+
+    <p id="pageMessage" class="message" role="status" aria-live="polite"></p>
+
+    <section class="card" aria-labelledby="filtrosTitulo">
+      <h2 id="filtrosTitulo">Buscar conductores</h2>
+      <form id="filtrosForm" class="filter-bar" novalidate>
+        <div>
+          <label for="filtroDocumento">Documento</label>
+          <input id="filtroDocumento" name="documento" type="text" placeholder="Ej. 10234567" />
+        </div>
+        <div>
+          <label for="filtroLicencia">N.º de licencia</label>
+          <input id="filtroLicencia" name="licencia" type="text" placeholder="Ej. LIC-10234567" />
+        </div>
+        <div>
+          <label for="filtroEstado">Estado</label>
+          <select id="filtroEstado" name="estado">
+            <option value="">Todos</option>
+            <option value="disponible">Disponible</option>
+            <option value="en_ruta">En ruta</option>
+            <option value="inactivo">Inactivo</option>
+          </select>
+        </div>
+        <div class="filter-actions">
+          <button type="submit" class="btn-small btn-primary">Buscar</button>
+          <button id="limpiarFiltros" type="button" class="btn-small btn-ghost">Limpiar</button>
+        </div>
+      </form>
+    </section>
+
+    <section class="table-wrapper" aria-label="Listado de conductores">
+      <table>
+        <thead>
+          <tr>
+            <th>Nombre</th>
+            <th>Documento</th>
+            <th>Teléfono</th>
+            <th>Correo</th>
+            <th>Licencia</th>
+            <th>Vencimiento</th>
+            <th>Estado</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody id="conductoresBody">
+          <tr><td colspan="8" class="empty">Cargando conductores…</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section id="formPanel" class="card form-panel" hidden aria-labelledby="formTitulo">
+      <h2 id="formTitulo">Nuevo conductor</h2>
+      <p id="formMessage" class="message" role="status" aria-live="polite"></p>
+
+      <form id="conductorForm" novalidate>
+        <input id="conductorId" type="hidden" />
+
+        <div class="form-grid">
+          <div>
+            <label for="nombres">Nombres</label>
+            <input id="nombres" name="nombres" type="text" maxlength="120" required />
+          </div>
+          <div>
+            <label for="apellidos">Apellidos</label>
+            <input id="apellidos" name="apellidos" type="text" maxlength="120" required />
+          </div>
+          <div>
+            <label for="documento">Documento</label>
+            <input id="documento" name="documento" type="text" maxlength="30" required />
+          </div>
+          <div>
+            <label for="telefono">Teléfono</label>
+            <input id="telefono" name="telefono" type="tel" maxlength="30" required />
+          </div>
+          <div>
+            <label for="correo">Correo electrónico</label>
+            <input id="correo" name="correo" type="email" maxlength="150" required />
+          </div>
+          <div>
+            <label for="numero_licencia">Número de licencia</label>
+            <input id="numero_licencia" name="numero_licencia" type="text" maxlength="50" required />
+          </div>
+          <div>
+            <label for="categoria_licencia">Categoría de licencia</label>
+            <input id="categoria_licencia" name="categoria_licencia" type="text" maxlength="10" required />
+          </div>
+          <div>
+            <label for="fecha_vencimiento_licencia">Vencimiento de la licencia</label>
+            <input id="fecha_vencimiento_licencia" name="fecha_vencimiento_licencia" type="date" required />
+          </div>
+          <div>
+            <label for="estado">Estado</label>
+            <select id="estado" name="estado">
+              <option value="disponible">Disponible</option>
+              <option value="en_ruta">En ruta</option>
+              <option value="inactivo">Inactivo</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <button id="guardarBtn" type="submit" class="btn-small btn-primary">Guardar conductor</button>
+          <button id="cancelarBtn" type="button" class="btn-small btn-ghost">Cancelar</button>
+        </div>
+      </form>
+    </section>
+  </main>
+
+  <script src="../js/auth.js"></script>
+  <script src="../js/api.js"></script>
+  <script src="../js/conductores.js"></script>
+</body>
+</html>
