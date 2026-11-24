@@ -18,9 +18,156 @@ Content-Type: application/json
 ### Estado del servicio (público)
 GET {{host}}/health
 
-### Listado (requiere token)
+### Listado general (requiere token)
 GET {{host}}/vehiculos
 Authorization: Bearer {{token}}
 
 ### Sin token -> 401
 GET {{host}}/vehiculos
+
+### Buscar por placa (coincidencia parcial)
+GET {{host}}/vehiculos/buscar?placa=abc
+Authorization: Bearer {{token}}
+
+### Buscar por tipo de vehículo
+GET {{host}}/vehiculos/buscar?tipo=cami
+Authorization: Bearer {{token}}
+
+### Buscar por estado
+GET {{host}}/vehiculos/buscar?estado=mantenimiento
+Authorization: Bearer {{token}}
+
+### Filtrar el listado directamente
+GET {{host}}/vehiculos?estado=en_ruta
+Authorization: Bearer {{token}}
+
+### Alias por estado
+GET {{host}}/vehiculos/estado/disponible
+Authorization: Bearer {{token}}
+
+### Alias por tipo
+GET {{host}}/vehiculos/tipo/Furgón
+Authorization: Bearer {{token}}
+
+### Consultar por id
+GET {{host}}/vehiculos/1
+Authorization: Bearer {{token}}
+
+### Crear vehículo -> 201
+# @name crear
+POST {{host}}/vehiculos
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "placa": "DEF456",
+  "tipo_vehiculo": "Camión",
+  "capacidad_carga": 15.75,
+  "modelo": "2022",
+  "marca": "Volvo",
+  "estado": "disponible"
+}
+
+@nuevoId = {{crear.response.body.id}}
+
+### Placa repetida -> 409 (se normaliza a mayúsculas)
+POST {{host}}/vehiculos
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "placa": "def456",
+  "tipo_vehiculo": "Furgón",
+  "capacidad_carga": 2.00,
+  "modelo": "2023",
+  "marca": "Renault"
+}
+
+### Capacidad de carga en 0 -> 422
+POST {{host}}/vehiculos
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "placa": "GHI789",
+  "tipo_vehiculo": "Camión",
+  "capacidad_carga": 0,
+  "modelo": "2020",
+  "marca": "Ford"
+}
+
+### Estado no válido -> 422
+POST {{host}}/vehiculos
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "placa": "JKL012",
+  "tipo_vehiculo": "Camión",
+  "capacidad_carga": 8.50,
+  "modelo": "2020",
+  "marca": "Ford",
+  "estado": "desconocido"
+}
+
+### Editar vehículo (PUT)
+PUT {{host}}/vehiculos/{{nuevoId}}
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "placa": "DEF456",
+  "tipo_vehiculo": "Tractomula",
+  "capacidad_carga": 18.25,
+  "modelo": "2023",
+  "marca": "Volvo",
+  "estado": "disponible"
+}
+
+### Editar solo la capacidad (PATCH)
+PATCH {{host}}/vehiculos/{{nuevoId}}
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "capacidad_carga": 20.00
+}
+
+### Capacidad negativa al editar -> 422
+PATCH {{host}}/vehiculos/{{nuevoId}}
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "capacidad_carga": -1
+}
+
+### Cambiar estado
+PATCH {{host}}/vehiculos/{{nuevoId}}/estado
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "estado": "mantenimiento"
+}
+
+### Estado no válido al cambiar -> 422
+PATCH {{host}}/vehiculos/{{nuevoId}}/estado
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "estado": "desconocido"
+}
+
+### Eliminar vehículo
+DELETE {{host}}/vehiculos/{{nuevoId}}
+Authorization: Bearer {{token}}
+
+### Eliminar vehículo con programaciones -> 409
+DELETE {{host}}/vehiculos/1
+Authorization: Bearer {{token}}
+
+### Id inexistente -> 404
+GET {{host}}/vehiculos/9999
+Authorization: Bearer {{token}}

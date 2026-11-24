@@ -96,7 +96,7 @@ cd frontend;               C:\xampp\php\php.exe -S 127.0.0.1:5501
 |---|---|---|---|
 | ms-auth | 8001 | `logitrans` | `GET /health`, `POST /login`, `GET /validate`, `POST /logout`, `GET /usuarios` |
 | ms-conductores | 8002 | `logitrans` | `GET /health`, CRUD de `/conductores`, búsquedas y cambio de estado |
-| ms-vehiculos | 8003 | `logitrans` | `GET /health`, `GET /vehiculos` |
+| ms-vehiculos | 8003 | `logitrans` | `GET /health`, CRUD de `/vehiculos`, búsquedas y cambio de estado |
 | ms-rutas | 8004 | `logitrans` | `GET /health`, `GET /rutas`, `GET /programaciones` |
 | ms-viajes | 8005 | `logitrans` | `GET /health`, `GET /seguimientos` |
 
@@ -137,6 +137,8 @@ al cargar el panel.
 - **Día 4:** CRUD de conductores con búsquedas, cambio de estado y validaciones.
 - **Día 5:** frontend de conductores: tabla con badges, filtros, formulario de
   alta/edición, cambio de estado y eliminación.
+- **Día 6:** CRUD de vehículos con búsquedas por placa/estado/tipo, cambio de
+  estado y validaciones.
 
 ## Requisitos de entrega
 
