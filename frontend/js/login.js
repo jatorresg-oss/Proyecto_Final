@@ -19,11 +19,7 @@ loginForm.addEventListener("submit", async (event) => {
 
   try {
     // Contrato de ms-auth: POST /login -> { token, user }
-    const data = await apiRequest(API.auth, "/login", {
-      method: "POST",
-      auth: false,
-      body: { usuario: identifier, password },
-    });
+    const data = await Api.auth.login({ usuario: identifier, password });
 
     Session.save(data.token, data.user);
     window.location.href = "pages/dashboard.html";

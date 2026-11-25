@@ -14,15 +14,18 @@ frontend/
 ├─ index.html               Inicio de sesión
 ├─ pages/
 │  ├─ dashboard.html        Panel operativo (acceso a los módulos)
-│  └─ conductores.html      ABM de conductores, filtros y estados
+│  ├─ conductores.html      ABM de conductores, filtros y estados
+│  └─ vehiculos.html        ABM de vehículos, filtros y estados
 ├─ css/
 │  └─ styles.css
 ├─ js/
-│  ├─ api.js                Configuración de servicios y fetch centralizado
+│  ├─ api.js                Servicios, fetch centralizado y contratos por recurso
 │  ├─ auth.js               Manejo del token y de la sesión
 │  ├─ login.js              Formulario de inicio de sesión
 │  ├─ dashboard.js          Panel posterior al login
-│  └─ conductores.js        Listado, formulario y acciones de conductores
+│  ├─ ui.js                 Utilidades compartidas (mensajes, badges, tablas)
+│  ├─ conductores.js        Listado, formulario y acciones de conductores
+│  └─ vehiculos.js          Listado, formulario y acciones de vehículos
 └─ README.md
 ```
 
@@ -77,6 +80,28 @@ respuesta del backend (incluidos los errores 409/422) se muestra al usuario.
 Toda la sesión se valida antes de cargar la página y cualquier `401` devuelve
 al login.
 
+## Módulo de vehículos (Día 7)
+
+Página `pages/vehiculos.html`, accesible desde la tarjeta «Vehículos» del panel
+y desde la navegación superior de conductores. Usa `GET /vehiculos` (filtros
+`placa`, `tipo` y `estado`), `GET /vehiculos/{id}`, `POST /vehiculos`,
+`PUT /vehiculos/{id}`, `PATCH /vehiculos/{id}/estado` y `DELETE /vehiculos/{id}`
+de ms-vehiculos.
+
+Incluye tabla con badges de estado (incluido `mantenimiento`), buscador,
+formulario de alta/edición, cambio rápido de estado y eliminación con
+confirmación. Las reglas de validación se repiten en `vehiculos.js` y en
+`VehiculosController.php`: placa única de 3 a 10 caracteres normalizada a
+mayúsculas, capacidad mayor que 0 con máximo 2 decimales y estado dentro del
+ENUM. El backend vuelve a validar y sus errores 409/422 se muestran al usuario.
+
+### Refactor compartido
+
+- `api.js` mantiene `apiRequest()` como único `fetch` y agrega `buildQuery()` y
+  el objeto `Api` con los contratos de `auth`, `conductores` y `vehiculos`.
+- `ui.js` centraliza mensajes, badges, celdas, botones, filas vacías, fecha ISO,
+  formato numérico y confirmaciones. `conductores.js` y `vehiculos.js` lo usan.
+
 ## Estado del proyecto
 
 - **Día 1:** estructura del proyecto, estilos base, capa de acceso a la API y
@@ -84,3 +109,4 @@ al login.
 - **Día 2:** reubicación dentro del repositorio único y datos de prueba.
 - **Día 3:** login operativo, validación de sesión y cierre de sesión real.
 - **Día 5:** módulo completo de conductores en el frontend.
+- **Día 6:** frontend de vehículos y capas compartidas `api.js`/`ui.js`.

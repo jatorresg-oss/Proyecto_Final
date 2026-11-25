@@ -17,10 +17,11 @@ frontend-logistica/
 │  ├─ index.html                 Inicio de sesión
 │  ├─ pages/
 │  │  ├─ dashboard.html          Panel operativo
-│  │  └─ conductores.html        ABM de conductores
+│  │  ├─ conductores.html        ABM de conductores
+│  │  └─ vehiculos.html          ABM de vehículos
 │  ├─ css/styles.css
 │  └─ js/                        api.js, auth.js, login.js, dashboard.js,
-│                                conductores.js
+│                                ui.js, conductores.js, vehiculos.js
 ├─ backend/
 │  ├─ ms-auth/                   Autenticación            (8001)
 │  ├─ ms-conductores/            Conductores              (8002)
@@ -139,6 +140,8 @@ al cargar el panel.
   alta/edición, cambio de estado y eliminación.
 - **Día 6:** CRUD de vehículos con búsquedas por placa/estado/tipo, cambio de
   estado y validaciones.
+- **Día 7:** frontend de vehículos y refactor de `api.js`/`ui.js` compartidos
+  por los módulos de conductores y vehículos.
 
 ## Requisitos de entrega
 

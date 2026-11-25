@@ -66,7 +66,7 @@ const Session = {
     }
 
     try {
-      const data = await apiRequest(API.auth, "/validate");
+      const data = await Api.auth.validate();
 
       if (data && data.user) {
         sessionStorage.setItem(this.USER_KEY, JSON.stringify(data.user));
@@ -87,7 +87,7 @@ const Session = {
     }
 
     try {
-      await apiRequest(API.auth, "/logout", { method: "POST" });
+      await Api.auth.logout();
     } catch (error) {
       console.warn("No fue posible cerrar la sesión en ms-auth:", error);
     } finally {

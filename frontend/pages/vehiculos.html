@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LogiTrans Express | Vehículos</title>
+  <link rel="stylesheet" href="../css/styles.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand-badge">LT</span>
+      <span>LogiTrans Express</span>
+      <nav class="topnav" aria-label="Navegación principal">
+        <a href="dashboard.html">Panel</a>
+        <a href="conductores.html">Conductores</a>
+        <a href="vehiculos.html" class="active">Vehículos</a>
+      </nav>
+    </div>
+    <div class="topbar-user">
+      <span id="userName">—</span>
+      <button id="logoutBtn" type="button" class="btn-ghost">Cerrar sesión</button>
+    </div>
+  </header>
+
+  <main class="container">
+    <div class="page-header">
+      <div>
+        <h1>Vehículos</h1>
+        <p class="muted">Flota, capacidad de carga y estados operativos.</p>
+      </div>
+      <button id="nuevoBtn" type="button" class="btn-small btn-primary">+ Nuevo vehículo</button>
+    </div>
+
+    <p id="pageMessage" class="message" role="status" aria-live="polite"></p>
+
+    <section class="card" aria-labelledby="filtrosTitulo">
+      <h2 id="filtrosTitulo">Buscar vehículos</h2>
+      <form id="filtrosForm" class="filter-bar" novalidate>
+        <div>
+          <label for="filtroPlaca">Placa</label>
+          <input id="filtroPlaca" name="placa" type="text" maxlength="10" placeholder="Ej. ABC123" />
+        </div>
+        <div>
+          <label for="filtroTipo">Tipo de vehículo</label>
+          <input id="filtroTipo" name="tipo" type="text" maxlength="60" placeholder="Ej. Camión" />
+        </div>
+        <div>
+          <label for="filtroEstado">Estado</label>
+          <select id="filtroEstado" name="estado">
+            <option value="">Todos</option>
+            <option value="disponible">Disponible</option>
+            <option value="en_ruta">En ruta</option>
+            <option value="mantenimiento">Mantenimiento</option>
+            <option value="inactivo">Inactivo</option>
+          </select>
+        </div>
+        <div class="filter-actions">
+          <button type="submit" class="btn-small btn-primary">Buscar</button>
+          <button id="limpiarFiltros" type="button" class="btn-small btn-ghost">Limpiar</button>
+        </div>
+      </form>
+    </section>
+
+    <section class="table-wrapper" aria-label="Listado de vehículos">
+      <table>
+        <thead>
+          <tr>
+            <th>Placa</th>
+            <th>Tipo</th>
+            <th>Capacidad</th>
+            <th>Modelo</th>
+            <th>Marca</th>
+            <th>Estado</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody id="vehiculosBody">
+          <tr><td colspan="7" class="empty">Cargando vehículos…</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section id="formPanel" class="card form-panel" hidden aria-labelledby="formTitulo">
+      <h2 id="formTitulo">Nuevo vehículo</h2>
+      <p id="formMessage" class="message" role="status" aria-live="polite"></p>
+
+      <form id="vehiculoForm" novalidate>
+        <input id="vehiculoId" type="hidden" />
+
+        <div class="form-grid">
+          <div>
+            <label for="placa">Placa</label>
+            <input id="placa" name="placa" type="text" maxlength="10" required />
+          </div>
+          <div>
+            <label for="tipo_vehiculo">Tipo de vehículo</label>
+            <input id="tipo_vehiculo" name="tipo_vehiculo" type="text" maxlength="60" required />
+          </div>
+          <div>
+            <label for="capacidad_carga">Capacidad de carga</label>
+            <input id="capacidad_carga" name="capacidad_carga" type="number" min="0.01" step="0.01" required />
+          </div>
+          <div>
+            <label for="modelo">Modelo</label>
+            <input id="modelo" name="modelo" type="text" maxlength="60" required />
+          </div>
+          <div>
+            <label for="marca">Marca</label>
+            <input id="marca" name="marca" type="text" maxlength="60" required />
+          </div>
+          <div>
+            <label for="estado">Estado</label>
+            <select id="estado" name="estado">
+              <option value="disponible">Disponible</option>
+              <option value="en_ruta">En ruta</option>
+              <option value="mantenimiento">Mantenimiento</option>
+              <option value="inactivo">Inactivo</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <button id="guardarBtn" type="submit" class="btn-small btn-primary">Guardar vehículo</button>
+          <button id="cancelarBtn" type="button" class="btn-small btn-ghost">Cancelar</button>
+        </div>
+      </form>
+    </section>
+  </main>
+
+  <script src="../js/auth.js"></script>
+  <script src="../js/api.js"></script>
+  <script src="../js/ui.js"></script>
+  <script src="../js/vehiculos.js"></script>
+</body>
+</html>

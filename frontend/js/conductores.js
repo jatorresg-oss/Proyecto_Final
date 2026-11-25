@@ -22,6 +22,14 @@ const CAMPOS_CONDUCTOR = [
   "estado",
 ];
 
+// Utilidades compartidas (ui.js): se conservan los nombres que ya usaba el módulo.
+const mostrarMensaje = UI.mostrarMensaje;
+const limpiarMensaje = UI.limpiarMensaje;
+const crearBadge = UI.crearBadge;
+const celdaTexto = UI.celdaTexto;
+const botonAccion = UI.botonAccion;
+const hoyISO = UI.hoyISO;
+
 let dom = {};
 
 if (Session.requireAuth()) {
@@ -101,20 +109,17 @@ async function initConductores() {
 /** Lista los conductores aplicando los filtros del formulario. */
 async function cargarConductores(limpiarMensajeAlCargar = true) {
   const datos = new FormData(dom.filtros);
-  const params = new URLSearchParams();
+  const filtros = {};
 
   for (const clave of ["documento", "licencia", "estado"]) {
     const valor = String(datos.get(clave) || "").trim();
     if (valor !== "") {
-      params.set(clave, valor);
+      filtros[clave] = valor;
     }
   }
 
-  const query = params.toString();
-  const path = "/conductores" + (query ? `?${query}` : "");
-
   try {
-    const conductores = await apiRequest(API.conductores, path);
+    const conductores = await Api.conductores.listar(filtros);
     renderTabla(Array.isArray(conductores) ? conductores : []);
     if (limpiarMensajeAlCargar) {
       limpiarMensaje(dom.pageMessage);
@@ -130,13 +135,9 @@ function renderTabla(conductores) {
   dom.body.textContent = "";
 
   if (conductores.length === 0) {
-    const fila = document.createElement("tr");
-    const celda = document.createElement("td");
-    celda.colSpan = 8;
-    celda.className = "empty";
-    celda.textContent = "No hay conductores que coincidan con la búsqueda.";
-    fila.appendChild(celda);
-    dom.body.appendChild(fila);
+    dom.body.appendChild(
+      UI.filaVacia(8, "No hay conductores que coincidan con la búsqueda.")
+    );
     return;
   }
 
@@ -203,29 +204,6 @@ function renderTabla(conductores) {
   dom.body.appendChild(fragmento);
 }
 
-function celdaTexto(texto) {
-  const celda = document.createElement("td");
-  celda.textContent = texto == null ? "" : String(texto);
-  return celda;
-}
-
-function crearBadge(texto, variante) {
-  const badge = document.createElement("span");
-  badge.className = `badge ${variante}`;
-  badge.textContent = texto;
-  return badge;
-}
-
-function botonAccion(texto, accion, id, claseExtra = "") {
-  const boton = document.createElement("button");
-  boton.type = "button";
-  boton.className = `btn-small ${claseExtra}`.trim();
-  boton.textContent = texto;
-  boton.dataset.accion = accion;
-  boton.dataset.id = String(id);
-  return boton;
-}
-
 /** Prepara el formulario para crear un conductor nuevo. */
 function abrirNuevo() {
   dom.form.reset();
@@ -243,7 +221,7 @@ function abrirNuevo() {
 /** Carga un conductor existente y lo coloca en el formulario. */
 async function editarConductor(id) {
   try {
-    const conductor = await apiRequest(API.conductores, `/conductores/${id}`);
+    const conductor = await Api.conductores.obtener(id);
     dom.form.reset();
 
     CAMPOS_CONDUCTOR.forEach((campo) => {
@@ -291,13 +269,15 @@ async function guardarConductor(event) {
   }
 
   const id = document.getElementById("conductorId").value;
-  const path = id ? `/conductores/${id}` : "/conductores";
-  const method = id ? "PUT" : "POST";
   const boton = dom.guardarBtn;
   boton.disabled = true;
 
   try {
-    await apiRequest(API.conductores, path, { method, body: datos });
+    if (id) {
+      await Api.conductores.actualizar(id, datos);
+    } else {
+      await Api.conductores.crear(datos);
+    }
     cerrarFormulario();
     mostrarMensaje(
       dom.pageMessage,
@@ -321,10 +301,7 @@ async function cambiarEstado(id, estado) {
   }
 
   try {
-    await apiRequest(API.conductores, `/conductores/${id}/estado`, {
-      method: "PATCH",
-      body: { estado },
-    });
+    await Api.conductores.cambiarEstado(id, estado);
     mostrarMensaje(dom.pageMessage, "Estado del conductor actualizado.", "success");
   } catch (error) {
     mostrarMensaje(dom.pageMessage, error.message || "No fue posible cambiar el estado.", "error");
@@ -334,13 +311,13 @@ async function cambiarEstado(id, estado) {
 }
 
 async function eliminarConductor(id) {
-  if (!window.confirm("¿Eliminar este conductor? Esta acción no se puede deshacer.")) {
+  if (!UI.confirmar("¿Eliminar este conductor? Esta acción no se puede deshacer.")) {
     await cargarConductores();
     return;
   }
 
   try {
-    await apiRequest(API.conductores, `/conductores/${id}`, { method: "DELETE" });
+    await Api.conductores.eliminar(id);
     mostrarMensaje(dom.pageMessage, "Conductor eliminado correctamente.", "success");
   } catch (error) {
     mostrarMensaje(dom.pageMessage, error.message || "No fue posible eliminar el conductor.", "error");
@@ -399,18 +376,4 @@ function validarConductor(datos) {
   return errores;
 }
 
-function hoyISO() {
-  const ahora = new Date();
-  const local = new Date(ahora.getTime() - ahora.getTimezoneOffset() * 60000);
-  return local.toISOString().slice(0, 10);
-}
-
-function mostrarMensaje(elemento, texto, tipo) {
-  elemento.textContent = texto;
-  elemento.className = `message ${tipo}`;
-}
-
-function limpiarMensaje(elemento) {
-  elemento.textContent = "";
-  elemento.className = "message";
-}
+// fin del módulo de conductores
