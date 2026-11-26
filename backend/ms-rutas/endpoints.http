@@ -18,12 +18,151 @@ Content-Type: application/json
 ### Estado del servicio (público)
 GET {{host}}/health
 
-### Listados (requieren token)
+### Listado general (requiere token)
 GET {{host}}/rutas
-Authorization: Bearer {{token}}
-
-GET {{host}}/programaciones
 Authorization: Bearer {{token}}
 
 ### Sin token -> 401
 GET {{host}}/rutas
+
+### Buscar por ciudad (origen o destino, coincidencia parcial)
+GET {{host}}/rutas/buscar?ciudad=Bogot
+Authorization: Bearer {{token}}
+
+### Buscar por origen
+GET {{host}}/rutas/buscar?origen=Medell
+Authorization: Bearer {{token}}
+
+### Buscar por destino
+GET {{host}}/rutas/buscar?destino=Cali
+Authorization: Bearer {{token}}
+
+### Buscar por tiempo estimado
+GET {{host}}/rutas/buscar?tiempo=horas
+Authorization: Bearer {{token}}
+
+### Alias por ciudad
+GET {{host}}/rutas/ciudad/Medell
+Authorization: Bearer {{token}}
+
+### Consultar tiempos estimados
+GET {{host}}/rutas/tiempos
+Authorization: Bearer {{token}}
+
+### Consultar por id
+GET {{host}}/rutas/1
+Authorization: Bearer {{token}}
+
+### Crear ruta -> 201
+# @name crear
+POST {{host}}/rutas
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "ciudad_origen": "Bogotá",
+  "ciudad_destino": "Bucaramanga",
+  "distancia": 390.50,
+  "tiempo_estimado": "7 horas",
+  "observaciones": "Ruta de prueba"
+}
+
+@nuevoId = {{crear.response.body.id}}
+
+### Ruta duplicada (origen + destino, ignorando mayúsculas) -> 409
+POST {{host}}/rutas
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "ciudad_origen": "bogotá",
+  "ciudad_destino": "bucaramanga",
+  "distancia": 400,
+  "tiempo_estimado": "8 horas"
+}
+
+### Distancia en 0 -> 422
+POST {{host}}/rutas
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "ciudad_origen": "Cali",
+  "ciudad_destino": "Popayán",
+  "distancia": 0,
+  "tiempo_estimado": "2 horas"
+}
+
+### Ciudad origen repetida con destino distinto -> 201 (no es duplicado)
+# @name otro
+POST {{host}}/rutas
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "ciudad_origen": "Bogotá",
+  "ciudad_destino": "Villavicencio",
+  "distancia": 110,
+  "tiempo_estimado": "2 horas"
+}
+
+@otroId = {{otro.response.body.id}}
+
+### Editar ruta (PUT)
+PUT {{host}}/rutas/{{nuevoId}}
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "ciudad_origen": "Bogotá",
+  "ciudad_destino": "Bucaramanga",
+  "distancia": 395.75,
+  "tiempo_estimado": "7 horas 30 minutos",
+  "observaciones": "Ruta actualizada"
+}
+
+### Editar solo las observaciones (PATCH)
+PATCH {{host}}/rutas/{{nuevoId}}
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "observaciones": "Sin novedades"
+}
+
+### Distancia negativa al editar -> 422
+PATCH {{host}}/rutas/{{nuevoId}}
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "distancia": -1
+}
+
+### Cambiar el destino a uno ya usado -> 409
+PATCH {{host}}/rutas/{{otroId}}
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "ciudad_destino": "Bucaramanga"
+}
+
+### Eliminar rutas de prueba
+DELETE {{host}}/rutas/{{nuevoId}}
+Authorization: Bearer {{token}}
+
+DELETE {{host}}/rutas/{{otroId}}
+Authorization: Bearer {{token}}
+
+### Eliminar ruta con programaciones -> 409
+DELETE {{host}}/rutas/1
+Authorization: Bearer {{token}}
+
+### Id inexistente -> 404
+GET {{host}}/rutas/9999
+Authorization: Bearer {{token}}
+
+### Listado de programaciones (sin cambios del Día 10)
+GET {{host}}/programaciones
+Authorization: Bearer {{token}}
