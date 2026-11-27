@@ -18,10 +18,11 @@ frontend-logistica/
 │  ├─ pages/
 │  │  ├─ dashboard.html          Panel operativo
 │  │  ├─ conductores.html        ABM de conductores
-│  │  └─ vehiculos.html          ABM de vehículos
+│  │  ├─ vehiculos.html          ABM de vehículos
+│  │  └─ rutas.html              ABM de rutas y tiempos estimados
 │  ├─ css/styles.css
 │  └─ js/                        api.js, auth.js, login.js, dashboard.js,
-│                                ui.js, conductores.js, vehiculos.js
+│                                ui.js, conductores.js, vehiculos.js, rutas.js
 ├─ backend/
 │  ├─ ms-auth/                   Autenticación            (8001)
 │  ├─ ms-conductores/            Conductores              (8002)
@@ -31,6 +32,8 @@ frontend-logistica/
 ├─ db/
 │  ├─ logitrans.sql              Esquema único + datos de prueba
 │  └─ README.md                  Instrucciones de importación
+├─ docs/
+│  └─ contrato-programacion.md   Diseño de la programación (Día 10)
 ├─ scripts/
 │  ├─ start-all.ps1              Levanta frontend y servicios
 │  ├─ health-check.ps1           Verifica /health
@@ -102,7 +105,8 @@ cd frontend;               C:\xampp\php\php.exe -S 127.0.0.1:5501
 | ms-viajes | 8005 | `logitrans` | `GET /health`, `GET /seguimientos` |
 
 Cada servicio documenta su contrato en su propio `README.md` y en
-`endpoints.http`.
+`endpoints.http`. El contrato de programación de viajes (pendiente de
+implementar) está en [`docs/contrato-programacion.md`](docs/contrato-programacion.md).
 
 ## Autenticación
 
@@ -144,6 +148,8 @@ al cargar el panel.
   por los módulos de conductores y vehículos.
 - **Día 8:** CRUD de rutas en ms-rutas con duplicados validados en PHP,
   distancia > 0, búsqueda por ciudad y consulta de tiempos estimados.
+- **Día 9:** frontend de rutas (tabla, filtros, formulario y tiempos estimados)
+  y diseño del contrato de programación para el Día 10.
 
 ## Requisitos de entrega
 

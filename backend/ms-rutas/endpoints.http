@@ -166,3 +166,50 @@ Authorization: Bearer {{token}}
 ### Listado de programaciones (sin cambios del Día 10)
 GET {{host}}/programaciones
 Authorization: Bearer {{token}}
+
+### ---------------------------------------------------------------------------
+### Contrato previsto para el Día 10 (NO implementado todavía).
+### Detalle completo en docs/contrato-programacion.md en la raíz del repositorio.
+### Las peticiones siguientes están comentadas para que no fallen al ejecutar
+### este archivo antes de que existan los endpoints.
+### ---------------------------------------------------------------------------
+
+# GET {{host}}/programaciones?conductor_id=1&vehiculo_id=1&ruta_id=1&estado=programado&fecha=2026-11-27
+# Authorization: Bearer {{token}}
+
+# GET {{host}}/programaciones/1
+# Authorization: Bearer {{token}}
+
+# POST {{host}}/programaciones
+# Authorization: Bearer {{token}}
+# Content-Type: application/json
+#
+# {
+#   "conductor_id": 1,
+#   "vehiculo_id": 1,
+#   "ruta_id": 1,
+#   "fecha_salida": "2026-11-27",
+#   "hora_salida": "06:00",
+#   "fecha_estimada_llegada": "2026-11-28",
+#   "observaciones": "Salida desde el centro de carga"
+# }
+
+# PUT {{host}}/programaciones/1
+# Authorization: Bearer {{token}}
+# Content-Type: application/json
+#
+# {
+#   "conductor_id": 2,
+#   "vehiculo_id": 3,
+#   "ruta_id": 1,
+#   "fecha_salida": "2026-11-28",
+#   "hora_salida": "07:30:00",
+#   "fecha_estimada_llegada": "2026-11-29",
+#   "observaciones": "Reprogramado por mantenimiento"
+# }
+
+# PATCH {{host}}/programaciones/1
+# Authorization: Bearer {{token}}
+# Content-Type: application/json
+#
+# { "estado": "cancelado" }

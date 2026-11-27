@@ -15,7 +15,8 @@ frontend/
 ├─ pages/
 │  ├─ dashboard.html        Panel operativo (acceso a los módulos)
 │  ├─ conductores.html      ABM de conductores, filtros y estados
-│  └─ vehiculos.html        ABM de vehículos, filtros y estados
+│  ├─ vehiculos.html        ABM de vehículos, filtros y estados
+│  └─ rutas.html            ABM de rutas, filtros y tiempos estimados
 ├─ css/
 │  └─ styles.css
 ├─ js/
@@ -25,7 +26,8 @@ frontend/
 │  ├─ dashboard.js          Panel posterior al login
 │  ├─ ui.js                 Utilidades compartidas (mensajes, badges, tablas)
 │  ├─ conductores.js        Listado, formulario y acciones de conductores
-│  └─ vehiculos.js          Listado, formulario y acciones de vehículos
+│  ├─ vehiculos.js          Listado, formulario y acciones de vehículos
+│  └─ rutas.js              Listado, formulario, filtros y tiempos de rutas
 └─ README.md
 ```
 
@@ -98,9 +100,30 @@ ENUM. El backend vuelve a validar y sus errores 409/422 se muestran al usuario.
 ### Refactor compartido
 
 - `api.js` mantiene `apiRequest()` como único `fetch` y agrega `buildQuery()` y
-  el objeto `Api` con los contratos de `auth`, `conductores` y `vehiculos`.
+  el objeto `Api` con los contratos de `auth`, `conductores`, `vehiculos` y
+  `rutas`.
 - `ui.js` centraliza mensajes, badges, celdas, botones, filas vacías, fecha ISO,
-  formato numérico y confirmaciones. `conductores.js` y `vehiculos.js` lo usan.
+  formato numérico y confirmaciones. Los tres módulos lo usan.
+
+## Módulo de rutas (Día 9)
+
+Página `pages/rutas.html`, accesible desde la tarjeta «Rutas» del panel y desde
+la navegación superior de conductores y vehículos. Usa `GET /rutas` (filtros
+`ciudad`, `origen`, `destino` y `tiempo`), `GET /rutas/buscar`,
+`GET /rutas/ciudad/{ciudad}`, `GET /rutas/tiempos`, `GET /rutas/{id}`,
+`POST /rutas`, `PUT /rutas/{id}` y `DELETE /rutas/{id}` de ms-rutas.
+
+Incluye tabla con distancia formateada, observaciones y botones de
+alta/edición/eliminación con confirmación; filtros combinables; y un panel
+«Ver tiempos estimados» que consume `GET /rutas/tiempos` (4 columnas). Las
+reglas de validación se repiten en `rutas.js` y en `RutasController.php`:
+origen/destino obligatorios de 2 a 100 caracteres, distancia > 0 con máximo 2
+decimales y tiempo estimado de hasta 50 caracteres. El backend revalida y sus
+errores 409/422 se muestran al usuario.
+
+La programación de viajes no se implementa todavía: su contrato quedó diseñado
+en [`docs/contrato-programacion.md`](../docs/contrato-programacion.md) para el
+Día 10 y su frontend para el Día 11.
 
 ## Estado del proyecto
 
@@ -109,4 +132,5 @@ ENUM. El backend vuelve a validar y sus errores 409/422 se muestran al usuario.
 - **Día 2:** reubicación dentro del repositorio único y datos de prueba.
 - **Día 3:** login operativo, validación de sesión y cierre de sesión real.
 - **Día 5:** módulo completo de conductores en el frontend.
-- **Día 6:** frontend de vehículos y capas compartidas `api.js`/`ui.js`.
+- **Día 7:** frontend de vehículos y capas compartidas `api.js`/`ui.js`.
+- **Día 9:** frontend de rutas y diseño del contrato de programación.

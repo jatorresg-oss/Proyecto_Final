@@ -134,4 +134,31 @@ const Api = {
       return apiRequest(API.vehiculos, `/vehiculos/${id}`, { method: "DELETE" });
     },
   },
+
+  rutas: {
+    listar(filtros = {}) {
+      return apiRequest(API.rutas, `/rutas${buildQuery(filtros)}`);
+    },
+    buscar(filtros = {}) {
+      return apiRequest(API.rutas, `/rutas/buscar${buildQuery(filtros)}`);
+    },
+    porCiudad(ciudad) {
+      return apiRequest(API.rutas, `/rutas/ciudad/${encodeURIComponent(ciudad)}`);
+    },
+    tiempos() {
+      return apiRequest(API.rutas, "/rutas/tiempos");
+    },
+    obtener(id) {
+      return apiRequest(API.rutas, `/rutas/${id}`);
+    },
+    crear(datos) {
+      return apiRequest(API.rutas, "/rutas", { method: "POST", body: datos });
+    },
+    actualizar(id, datos) {
+      return apiRequest(API.rutas, `/rutas/${id}`, { method: "PUT", body: datos });
+    },
+    eliminar(id) {
+      return apiRequest(API.rutas, `/rutas/${id}`, { method: "DELETE" });
+    },
+  },
 };
