@@ -20,7 +20,11 @@ return function (App $app) {
         $group->patch('/rutas/{id}', [RutasRepository::class, 'update']);
         $group->delete('/rutas/{id}', [RutasRepository::class, 'destroy']);
 
-        // La programación se amplía en el Día 10; se mantiene el listado actual.
+        // Programación de viajes (Día 10). No se expone DELETE: se cancela con PATCH.
         $group->get('/programaciones', [ProgramacionesRepository::class, 'all']);
+        $group->get('/programaciones/{id}', [ProgramacionesRepository::class, 'show']);
+        $group->post('/programaciones', [ProgramacionesRepository::class, 'store']);
+        $group->put('/programaciones/{id}', [ProgramacionesRepository::class, 'update']);
+        $group->patch('/programaciones/{id}', [ProgramacionesRepository::class, 'update']);
     })->add($auth);
 };

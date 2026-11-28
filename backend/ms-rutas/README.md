@@ -18,7 +18,7 @@ ms-rutas/
 ├─ app/
 │  ├─ Controllers/
 │  │  ├─ RutasController.php           Reglas de negocio y validaciones
-│  │  └─ ProgramacionesController.php  Listado inicial (Día 10)
+│  │  └─ ProgramacionesController.php  Reglas de programación y disponibilidad
 │  ├─ Models/                          Ruta.php, ProgramacionViaje.php, Usuario.php
 │  ├─ Presentation/
 │  │  ├─ Repositories/                 RutasRepository.php, ProgramacionesRepository.php
@@ -115,28 +115,75 @@ Respuestas de error con `{ "message": "..." }`:
 | 422 | Datos inválidos (obligatorios, formato o distancia) |
 | 500 | Error de base de datos |
 
-## Programación de viajes
+## Programación de viajes (Día 10)
 
-`GET /programaciones` sigue disponible con el listado inicial. El alta, los
-filtros y la reprogramación se implementan en el **Día 10** en este mismo
-microservicio, porque el enunciado asigna la programación a `ms-rutas`.
+La programación se implementa en este microservicio porque el enunciado asigna
+esa responsabilidad a `ms-rutas`. Todas las rutas requieren token Bearer.
 
-El contrato completo (endpoints, payloads, validaciones, solapamientos y
-responsabilidades frente a `ms-viajes`) quedó documentado en el Día 9 en
-[`docs/contrato-programacion.md`](../../docs/contrato-programacion.md).
-Resumen de lo previsto:
-
-| Método | Ruta prevista | Uso |
+| Método | Ruta | Descripción |
 |---|---|---|
-| GET | `/programaciones?conductor_id=&vehiculo_id=&ruta_id=&estado=&fecha=` | Listado filtrado |
-| GET | `/programaciones/{id}` | Detalle |
-| POST | `/programaciones` | Programar (siempre nace `programado`) |
-| PUT / PATCH | `/programaciones/{id}` | Reprogramar o cancelar |
+| GET | `/programaciones` | Listado; acepta `?conductor_id=&vehiculo_id=&ruta_id=&estado=&fecha=` |
+| GET | `/programaciones/{id}` | Detalle (`404` si no existe) |
+| POST | `/programaciones` | Programar un viaje; responde `201` y siempre nace `programado` |
+| PUT | `/programaciones/{id}` | Reprogramar todos los campos editables |
+| PATCH | `/programaciones/{id}` | Reprogramación parcial o cancelación |
 
-No se prevé `DELETE`: la cancelación es `PATCH { "estado": "cancelado" }`.
-Las reglas se revalidan en backend contra la base compartida: conductor no
-inactivo, vehículo sin mantenimiento, fechas válidas y sin solapamiento en la
-misma fecha. No hay llamadas HTTP a otros microservicios.
+No se expone `DELETE`: un viaje se cancela con
+`PATCH { "estado": "cancelado" }` para conservar el historial.
+
+### Ejemplo de programación
+
+```http
+POST /programaciones
+Authorization: Bearer <token>
+Content-Type: application/json
+
+{
+  "conductor_id": 1,
+  "vehiculo_id": 1,
+  "ruta_id": 1,
+  "fecha_salida": "2026-11-28",
+  "hora_salida": "06:00",
+  "fecha_estimada_llegada": "2026-11-29",
+  "observaciones": "Salida desde el centro de carga"
+}
+```
+
+`hora_salida` admite `HH:MM` y `HH:MM:SS` (se normaliza a `HH:MM:SS`).
+La fecha de salida no puede ser anterior a hoy y la llegada estimada no puede
+ser anterior a la salida. En reprogramación esa regla de "no pasado" solo se
+aplica si se envía `fecha_salida`, para no bloquear la cancelación de viajes
+antiguos.
+
+### Validaciones de programación
+
+- Obligatorios en el alta: conductor, vehículo, ruta, fecha de salida, hora de
+  salida y fecha estimada de llegada (`422`).
+- Los IDs deben ser positivos y existir en las tablas referenciadas (`422`).
+- Conductor `inactivo` o vehículo en `mantenimiento`/`inactivo` (`409`).
+- Solapamiento: otro viaje `programado`, `en_transito` o `retrasado` con el
+  mismo conductor o vehículo en la misma `fecha_salida` (`409`). Los viajes
+  `finalizado` y `cancelado` no ocupan la fecha. En `PUT`/`PATCH` se excluye el
+  propio registro.
+- Solo se reprograman viajes `programado` o `retrasado` (`409`). Los estados
+  `en_transito` y `finalizado` se gestionan en `ms-viajes`.
+- `estado` fuera del ENUM (`422`). La cancelación solo es válida desde
+  `programado` o `retrasado`.
+- La disponibilidad se revalida en backend contra la base compartida; no hay
+  llamadas HTTP a `ms-conductores` ni a `ms-vehiculos`. El contrato completo,
+  incluido el reparto de responsabilidades con `ms-viajes`, está en
+  [`docs/contrato-programacion.md`](../../docs/contrato-programacion.md).
+
+### Errores de programación
+
+| Código | Situación |
+|---|---|
+| 400 | Cuerpo JSON inválido |
+| 401 | Token ausente, inválido o sesión cerrada |
+| 404 | Programación no encontrada |
+| 409 | Recurso no disponible, solapamiento o transición de estado no permitida |
+| 422 | Campos obligatorios, IDs, formatos, fechas o estado no válidos |
+| 500 | Error de base de datos o error inesperado |
 
 ## Base de datos
 
@@ -154,3 +201,5 @@ HTTP a otros microservicios) para validar las referencias lógicas.
 - **Día 8:** CRUD de rutas, duplicados en PHP, distancia > 0 y búsqueda por ciudad.
 - **Día 9:** diseño del contrato de programación para el Día 10 en
   `docs/contrato-programacion.md`.
+- **Día 10:** programación de viajes: filtros, detalle, alta, reprogramación,
+  cancelación y validación de disponibilidad en backend.

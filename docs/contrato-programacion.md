@@ -1,9 +1,9 @@
-# Contrato de programación de viajes (diseño — Día 9)
+# Contrato de programación de viajes (implementado — Día 10)
 
-Documento de diseño para la **programación de viajes** que se implementará en el
-**Día 10** en `ms-rutas` (puerto 8004) y se conectará al frontend en el **Día 11**.
-El listado `GET /programaciones` ya existe; el resto de los endpoints de esta
-tabla **todavía no están implementados**.
+Contrato de la **programación de viajes** de `ms-rutas` (puerto 8004), diseñado
+en el Día 9 e implementado en el **Día 10**. La conexión desde el frontend
+(`Api.programaciones` y `pages/programacion.html`) queda para el **Día 11**.
+Todos los endpoints de este documento están disponibles y probados.
 
 ## 1. Restricción de arquitectura
 
@@ -33,14 +33,14 @@ El alta siempre crea el registro con `estado = programado`, aunque el cuerpo
 traiga otro valor. Los cambios posteriores de estado de un viaje en curso son
 responsabilidad de `ms-viajes` (Día 12) sobre la misma tabla.
 
-## 3. Endpoints previstos (ms-rutas)
+## 3. Endpoints (ms-rutas)
 
 Todos requieren `Authorization: Bearer <token>` (el token se valida en la base
 compartida). `/health` sigue público.
 
 | Método | Ruta | Descripción | Respuesta |
 |---|---|---|---|
-| GET | `/programaciones` | Listado con filtros (ya implementado, se ampliará) | 200 + array |
+| GET | `/programaciones` | Listado con filtros | 200 + array |
 | GET | `/programaciones/{id}` | Detalle de una programación | 200 + objeto |
 | POST | `/programaciones` | Programar un viaje | 201 + objeto |
 | PUT | `/programaciones/{id}` | Reprogramar (todos los campos editables) | 200 + objeto |
@@ -171,14 +171,48 @@ Página `pages/programacion.html` + `js/programacion.js`:
 | POST | `/viajes/{id}/finalizar` | Solo si fue iniciado; 409 en caso contrario |
 | GET | `/viajes/{id}/seguimiento` | Historial de novedades y estados |
 
-## 7. Criterios de aceptación para el Día 10
+## 7. Criterios de aceptación del Día 10
 
-- [ ] `GET /programaciones` admite los 5 filtros y mantiene 200 con el seed.
-- [ ] `GET /programaciones/{id}` responde 200 / 404 correctamente.
-- [ ] `POST /programaciones` crea con `estado = programado` y responde 201.
-- [ ] No se puede programar conductor inactivo ni vehículo en mantenimiento (409).
-- [ ] No se permite solapamiento por conductor/vehículo en la misma fecha (409).
-- [ ] `PUT`/`PATCH` reprograman y validan el estado permitido (200 / 409 / 422).
-- [ ] `PATCH { "estado": "cancelado" }` funciona solo desde `programado`/`retrasado`.
-- [ ] Errores con `{ "message": "..." }` y códigos 400/401/404/409/422/500.
-- [ ] `endpoints.http` y `README.md` de `ms-rutas` documentan los endpoints.
+- [x] `GET /programaciones` admite los 5 filtros y mantiene 200 con el seed.
+- [x] `GET /programaciones/{id}` responde 200 / 404 correctamente.
+- [x] `POST /programaciones` crea con `estado = programado` y responde 201.
+- [x] No se puede programar conductor inactivo ni vehículo en mantenimiento (409).
+- [x] No se permite solapamiento por conductor/vehículo en la misma fecha (409).
+- [x] `PUT`/`PATCH` reprograman y validan el estado permitido (200 / 409 / 422).
+- [x] `PATCH { "estado": "cancelado" }` funciona solo desde `programado`/`retrasado`.
+- [x] Errores con `{ "message": "..." }` y códigos 400/401/404/409/422/500.
+- [x] `endpoints.http` y `README.md` de `ms-rutas` documentan los endpoints.
+
+## 8. Implementación (Día 10)
+
+Archivos modificados en `backend/ms-rutas/`:
+
+- `app/Controllers/ProgramacionesController.php`: reglas de negocio, filtros,
+  validaciones, disponibilidad y solapamiento contra la base compartida.
+- `app/Presentation/Repositories/ProgramacionesRepository.php`: adaptadores
+  HTTP (`all`, `show`, `store`, `update`) y respuestas JSON con códigos
+  400/404/409/422/500.
+- `app/Presentation/Routers/endpoints.php`: cinco rutas nuevas; sin `DELETE`.
+- `README.md` y `endpoints.http`: documentación y pruebas manuales.
+
+Decisiones concretas:
+
+- Un viaje nace siempre `programado`: se ignora cualquier `estado` enviado en
+  el `POST`.
+- `hora_salida` acepta `HH:MM` y `HH:MM:SS` y se guarda como `HH:MM:SS`.
+- La regla "fecha de salida no anterior a hoy" se aplica en el alta y en la
+  reprogramación **solo si se envía `fecha_salida`**. Así se puede cancelar o
+  anotar observaciones en programaciones antiguas sin un 422 artificial.
+- La disponibilidad de conductor/vehículo se revalida en `POST` y cuando
+  `PUT`/`PATCH` cambian conductor, vehículo o fecha. No se comprueba al
+  cancelar ni al editar solo observaciones.
+- Los estados `en_transito` y `finalizado` no se aceptan desde `ms-rutas` (409):
+  pertenecen a `ms-viajes`. Los viajes `en_transito`, `finalizado` y `cancelado`
+  son definitivos desde este servicio (409 al intentar editarlos).
+- No se crean modelos de `conductores`/`vehiculos` en `ms-rutas`: se leen con
+  el query builder de Eloquent sobre la base compartida para no duplicar la
+  propiedad de esos recursos.
+
+Pruebas ejecutadas: `GET` (listado, filtros, detalle y 404), `POST` (201 y
+errores 400/409/422), `PUT` (200), `PATCH` (cancelación 200, transiciones 409),
+token ausente (401) y filtro por estado cancelado (200).

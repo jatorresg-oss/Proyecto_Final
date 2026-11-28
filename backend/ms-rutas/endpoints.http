@@ -163,53 +163,224 @@ Authorization: Bearer {{token}}
 GET {{host}}/rutas/9999
 Authorization: Bearer {{token}}
 
-### Listado de programaciones (sin cambios del Día 10)
+### ---------------------------------------------------------------------------
+### Programación de viajes (Día 10)
+### Ajustar las fechas si se ejecuta este archivo en otro día.
+### Contrato completo: docs/contrato-programacion.md en la raíz del repositorio.
+### ---------------------------------------------------------------------------
+
+@fecha = 2026-11-28
+@llegada = 2026-11-29
+@reprograma = 2026-11-30
+@llegadaReprograma = 2026-12-01
+
+### Listado general de programaciones -> 200
 GET {{host}}/programaciones
 Authorization: Bearer {{token}}
 
-### ---------------------------------------------------------------------------
-### Contrato previsto para el Día 10 (NO implementado todavía).
-### Detalle completo en docs/contrato-programacion.md en la raíz del repositorio.
-### Las peticiones siguientes están comentadas para que no fallen al ejecutar
-### este archivo antes de que existan los endpoints.
-### ---------------------------------------------------------------------------
+### Listado filtrado (conductor + fecha) -> 200
+GET {{host}}/programaciones?conductor_id=1&fecha=2026-11-20
+Authorization: Bearer {{token}}
 
-# GET {{host}}/programaciones?conductor_id=1&vehiculo_id=1&ruta_id=1&estado=programado&fecha=2026-11-27
-# Authorization: Bearer {{token}}
+### Todos los filtros a la vez -> 200
+GET {{host}}/programaciones?conductor_id=1&vehiculo_id=1&ruta_id=1&estado=programado&fecha=2026-11-20
+Authorization: Bearer {{token}}
 
-# GET {{host}}/programaciones/1
-# Authorization: Bearer {{token}}
+### Detalle de una programación -> 200
+GET {{host}}/programaciones/1
+Authorization: Bearer {{token}}
 
-# POST {{host}}/programaciones
-# Authorization: Bearer {{token}}
-# Content-Type: application/json
-#
-# {
-#   "conductor_id": 1,
-#   "vehiculo_id": 1,
-#   "ruta_id": 1,
-#   "fecha_salida": "2026-11-27",
-#   "hora_salida": "06:00",
-#   "fecha_estimada_llegada": "2026-11-28",
-#   "observaciones": "Salida desde el centro de carga"
-# }
+### Detalle inexistente -> 404
+GET {{host}}/programaciones/9999
+Authorization: Bearer {{token}}
 
-# PUT {{host}}/programaciones/1
-# Authorization: Bearer {{token}}
-# Content-Type: application/json
-#
-# {
-#   "conductor_id": 2,
-#   "vehiculo_id": 3,
-#   "ruta_id": 1,
-#   "fecha_salida": "2026-11-28",
-#   "hora_salida": "07:30:00",
-#   "fecha_estimada_llegada": "2026-11-29",
-#   "observaciones": "Reprogramado por mantenimiento"
-# }
+### Programar viaje -> 201 (siempre nace "programado")
+# @name crearProgramacion
+POST {{host}}/programaciones
+Authorization: Bearer {{token}}
+Content-Type: application/json
 
-# PATCH {{host}}/programaciones/1
-# Authorization: Bearer {{token}}
-# Content-Type: application/json
-#
-# { "estado": "cancelado" }
+{
+  "conductor_id": 1,
+  "vehiculo_id": 1,
+  "ruta_id": 1,
+  "fecha_salida": "{{fecha}}",
+  "hora_salida": "06:00",
+  "fecha_estimada_llegada": "{{llegada}}",
+  "observaciones": "Salida desde el centro de carga"
+}
+
+@nuevaProgramacion = {{crearProgramacion.response.body.id}}
+
+### Ver la programación recién creada -> 200
+GET {{host}}/programaciones/{{nuevaProgramacion}}
+Authorization: Bearer {{token}}
+
+### Mismo conductor y vehículo en la misma fecha -> 409
+POST {{host}}/programaciones
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "conductor_id": 1,
+  "vehiculo_id": 1,
+  "ruta_id": 1,
+  "fecha_salida": "{{fecha}}",
+  "hora_salida": "08:00",
+  "fecha_estimada_llegada": "{{llegada}}"
+}
+
+### Conductor inactivo (id 3) -> 409
+POST {{host}}/programaciones
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "conductor_id": 3,
+  "vehiculo_id": 1,
+  "ruta_id": 1,
+  "fecha_salida": "{{fecha}}",
+  "hora_salida": "08:00",
+  "fecha_estimada_llegada": "{{llegada}}"
+}
+
+### Vehículo en mantenimiento (id 3) -> 409
+POST {{host}}/programaciones
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "conductor_id": 2,
+  "vehiculo_id": 3,
+  "ruta_id": 1,
+  "fecha_salida": "{{fecha}}",
+  "hora_salida": "08:00",
+  "fecha_estimada_llegada": "{{llegada}}"
+}
+
+### Referencia inexistente -> 422
+POST {{host}}/programaciones
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "conductor_id": 9999,
+  "vehiculo_id": 1,
+  "ruta_id": 1,
+  "fecha_salida": "{{fecha}}",
+  "hora_salida": "08:00",
+  "fecha_estimada_llegada": "{{llegada}}"
+}
+
+### Fecha de salida en el pasado -> 422
+POST {{host}}/programaciones
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "conductor_id": 1,
+  "vehiculo_id": 1,
+  "ruta_id": 1,
+  "fecha_salida": "2026-11-26",
+  "hora_salida": "08:00",
+  "fecha_estimada_llegada": "{{llegada}}"
+}
+
+### Llegada anterior a la salida -> 422
+POST {{host}}/programaciones
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "conductor_id": 1,
+  "vehiculo_id": 1,
+  "ruta_id": 1,
+  "fecha_salida": "{{fecha}}",
+  "hora_salida": "08:00",
+  "fecha_estimada_llegada": "2026-11-27"
+}
+
+### Hora inválida -> 422
+POST {{host}}/programaciones
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "conductor_id": 1,
+  "vehiculo_id": 1,
+  "ruta_id": 1,
+  "fecha_salida": "{{fecha}}",
+  "hora_salida": "25:00",
+  "fecha_estimada_llegada": "{{llegada}}"
+}
+
+### Campos obligatorios ausentes -> 422
+POST {{host}}/programaciones
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{ "conductor_id": 1 }
+
+### Cuerpo JSON inválido -> 400
+POST {{host}}/programaciones
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{ "conductor_id":
+
+### Reprogramar todos los campos (PUT) -> 200
+PUT {{host}}/programaciones/{{nuevaProgramacion}}
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "conductor_id": 1,
+  "vehiculo_id": 1,
+  "ruta_id": 2,
+  "fecha_salida": "{{reprograma}}",
+  "hora_salida": "07:30:00",
+  "fecha_estimada_llegada": "{{llegadaReprograma}}",
+  "observaciones": "Reprogramado por mantenimiento"
+}
+
+### Reprogramar solo observaciones (PATCH) -> 200
+PATCH {{host}}/programaciones/{{nuevaProgramacion}}
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{ "observaciones": "Sin novedades" }
+
+### Cancelar (solo desde programado/retrasado) -> 200
+PATCH {{host}}/programaciones/{{nuevaProgramacion}}
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{ "estado": "cancelado" }
+
+### Editar un viaje cancelado -> 409
+PATCH {{host}}/programaciones/{{nuevaProgramacion}}
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{ "observaciones": "Otra vez" }
+
+### Editar un viaje en_transito -> 409
+PATCH {{host}}/programaciones/2
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{ "estado": "cancelado" }
+
+### Estado fuera del ENUM -> 422
+PATCH {{host}}/programaciones/1
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{ "estado": "desconocido" }
+
+### Viajes cancelados -> 200
+GET {{host}}/programaciones?estado=cancelado
+Authorization: Bearer {{token}}
+
+### Sin token -> 401
+GET {{host}}/programaciones

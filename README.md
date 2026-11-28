@@ -33,7 +33,7 @@ frontend-logistica/
 │  ├─ logitrans.sql              Esquema único + datos de prueba
 │  └─ README.md                  Instrucciones de importación
 ├─ docs/
-│  └─ contrato-programacion.md   Diseño de la programación (Día 10)
+│  └─ contrato-programacion.md   Contrato de la programación (Día 10)
 ├─ scripts/
 │  ├─ start-all.ps1              Levanta frontend y servicios
 │  ├─ health-check.ps1           Verifica /health
@@ -101,12 +101,12 @@ cd frontend;               C:\xampp\php\php.exe -S 127.0.0.1:5501
 | ms-auth | 8001 | `logitrans` | `GET /health`, `POST /login`, `GET /validate`, `POST /logout`, `GET /usuarios` |
 | ms-conductores | 8002 | `logitrans` | `GET /health`, CRUD de `/conductores`, búsquedas y cambio de estado |
 | ms-vehiculos | 8003 | `logitrans` | `GET /health`, CRUD de `/vehiculos`, búsquedas y cambio de estado |
-| ms-rutas | 8004 | `logitrans` | `GET /health`, CRUD de `/rutas`, búsquedas, tiempos y `GET /programaciones` |
+| ms-rutas | 8004 | `logitrans` | `GET /health`, CRUD de `/rutas`, búsquedas, tiempos y CRUD de programaciones (alta, filtros, reprogramación y cancelación) |
 | ms-viajes | 8005 | `logitrans` | `GET /health`, `GET /seguimientos` |
 
 Cada servicio documenta su contrato en su propio `README.md` y en
-`endpoints.http`. El contrato de programación de viajes (pendiente de
-implementar) está en [`docs/contrato-programacion.md`](docs/contrato-programacion.md).
+`endpoints.http`. El contrato de programación de viajes (implementado en el
+Día 10) está en [`docs/contrato-programacion.md`](docs/contrato-programacion.md).
 
 ## Autenticación
 
@@ -150,6 +150,8 @@ al cargar el panel.
   distancia > 0, búsqueda por ciudad y consulta de tiempos estimados.
 - **Día 9:** frontend de rutas (tabla, filtros, formulario y tiempos estimados)
   y diseño del contrato de programación para el Día 10.
+- **Día 10:** programación de viajes en ms-rutas: alta, filtros, detalle,
+  reprogramación y cancelación, con validación de disponibilidad en backend.
 
 ## Requisitos de entrega
 
